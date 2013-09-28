@@ -8,12 +8,11 @@ import Data.List.Split
 tabSize :: Int
 tabSize = 8
 
-letterSize :: Char -> Int
-letterSize x = if x == '\t' then tabSize else 1
+charSize :: Char -> Int
+charSize x = if x == '\t' then tabSize else 1
 
 stringSize :: String -> Int
-stringSize =
-   sum . map letterSize
+stringSize = sum . map charSize
 
 splitString :: (String -> Int) -> Int -> String -> [String]
 splitString size maxSize string =
