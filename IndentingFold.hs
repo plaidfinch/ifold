@@ -4,23 +4,15 @@ import Control.Applicative
 import Control.Arrow
 import Data.Maybe
 import Data.List.Split
+import Data.Char
 
-spaceChars :: [Char]
-spaceChars = "\t "
-
-whitespace :: Char -> Bool
-whitespace = any id . (map (==) spaceChars <*>) . (:[])
-
-tabSize :: Int
-tabSize = 8
-
-charSize :: Char -> Int
-charSize x = case x of
+charSize :: Int -> Char -> Int
+charSize tabSize x = case x of
    '\t'      -> tabSize
    otherwise -> 1
 
-stringSize :: String -> Int
-stringSize = sum . map charSize
+stringSize :: Int -> String -> Int
+stringSize tabSize = sum . map (charSize tabSize)
 
 spanSize :: (a -> Int) -> Int -> [a] -> ([a],[a])
 spanSize size len list =
@@ -28,27 +20,28 @@ spanSize size len list =
    span ((<= len) . snd) $
    zip list $ scanl1 (+) (map size list)
 
-splitString :: Int -> String -> [String]
-splitString maxSize string =
+splitString :: Int -> Int -> String -> [String]
+splitString tabSize maxSize string =
    let (str,rest) = splitChunk string
    in case (str,rest) of
       ("","")     -> []
-      ("",rest)   -> let (str',rest') = spanSize charSize maxSize rest
-                     in                   str' : thisSplit rest'
-      otherwise   -> dropWhile whitespace str  : thisSplit rest
+      ("",rest)   -> let (str',rest') = spanSize (charSize tabSize) maxSize rest
+                     in                str' : thisSplit rest'
+      otherwise   -> dropWhile isSpace str  : thisSplit rest
    where
-      thisSplit = splitString maxSize
+      thisSplit = splitString tabSize maxSize
       splitChunk str =
-         (concat *** concat) $ spanSize stringSize maxSize ws
-         where ws = split (keepDelimsL $ oneOf spaceChars) str
+         (concat *** concat) $ spanSize (stringSize tabSize) maxSize ws
+         where ws = split (keepDelimsL $ whenElt isSpace) str
 
--- Takes a line and folds it into a list of lines, returning Nothing in the case where there is a wider initial segment of tabs than the line (we can't ever give a good formatting for this case).
-foldLine :: Int -> String -> [String]
-foldLine maxSize line =
-   if stringSize tabs < maxSize
-      then map (tabs ++) $
-           splitString (maxSize - stringSize tabs) string
-      else splitString  maxSize                    string
-   where (tabs,string) = span whitespace line
+-- Takes a line and folds it into a list of lines
+foldLine :: Int -> Int -> String -> [String]
+foldLine tabSize maxSize line =
+   if dropWhile isSpace line == "" then [""] -- if line is only spaces, print a newline
+   else if (stringSize tabSize) tabs < maxSize
+      then map (tabs ++) $ splitString tabSize maxSize' string
+      else                 splitString tabSize maxSize  string
+   where (tabs,string) = span isSpace line
          maxTabs = floor (toRational maxSize / toRational tabSize)
+         maxSize' = maxSize - (stringSize tabSize) tabs
 
