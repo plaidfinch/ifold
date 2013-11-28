@@ -9,7 +9,8 @@ Example usage
 The normal UNIX `fold` command looks like this:
 
 ```
-> echo -e "\nThis is a test of the UNIX fold utility.\n\n\tNotice that indented paragraphs don't get indented as a whole." | fold -s -w 20
+> echo -e "\nThis is a test of the UNIX fold utility.\n\n\tNotice that indented paragraphs don't get inden
+ted as a whole." | fold -s -w 20
 
 This is a test of 
 the UNIX fold 
@@ -24,7 +25,8 @@ as a whole.
 Using `ifold` instead will produce the following:
 
 ```
-> echo -e "\nThis is a test of the ifold utility.\n\n\tNotice that indented paragraphs will be indented as a whole." | ifold 20
+> echo -e "\nThis is a test of the ifold utility.\n\n\tNotice that indented paragraphs will be indented 
+as a whole." | ifold 20
 
 This is a test of
 the ifold utility.
