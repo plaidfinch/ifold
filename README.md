@@ -25,8 +25,8 @@ as a whole.
 Using `ifold` instead will produce the following:
 
 ```
-> echo -e "\nThis is a test of the ifold utility.\n\n\tNotice that indented paragraphs will be indented 
-as a whole." | ifold 20
+> echo -e "\nThis is a test of the ifold utility.\n\n\tNotice that indented paragraphs will be indented as
+a whole." | ifold 20
 
 This is a test of
 the ifold utility.
